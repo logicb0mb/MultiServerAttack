@@ -8,14 +8,15 @@ const instagram = {
   browser: null,
   page: null,
 
-  initialize: async () => {
+  initialize: async headlessValue => {
     instagram.browser = await puppeteer.launch({
-      headless: false
+      headless: headlessValue
     });
-
     instagram.page = await instagram.browser.newPage();
+    await instagram.page.goto(BASE_URL, { waitUntil: 'networkidle2' });
     await instagram.page.setViewport({ width: 1366, height: 768 });
     await instagram.page.waitFor(500);
+
     await instagram.page.screenshot({
       path: './images/instagram_images/insta_homepage.png'
     });
@@ -23,12 +24,12 @@ const instagram = {
 
   login: async (username, password) => {
     await instagram.page.goto(BASE_URL, { waitUntil: 'networkidle2' });
-    await instagram.page.waitForXPath('//a[contains(text(), "Log in")]', 500);
-    let loginButton = await instagram.page.$x(
-      '//a[contains(text(), "Log in")]'
-    );
+    // await instagram.page.waitForXPath('//a[contains(text(), "Log in")]', 500);
+    // let loginButton = await instagram.page.$x(
+    //   '//a[contains(text(), "Log in")]'
+    // );
     // click on the login button
-    await loginButton[0].click();
+    // await loginButton[0].click();
     // await instagram.page.waitForNavigation({ waitUntil: 'networkidle2' });
 
     // typing in the username and the password
@@ -46,7 +47,7 @@ const instagram = {
     console.log(`Clicking login button`);
     // clicking on the login button on the login page
     await instagram.page.click(
-      '#react-root > section > main > div > article > div > div:nth-child(1) > div > form > div:nth-child(4)'
+      '#react-root > section > main > article > div.rgFsT > div:nth-child(1) > div > form > div:nth-child(4) > button > div'
     );
 
     await instagram.page.waitFor(5000); //waiting for 5 seconds
@@ -116,6 +117,9 @@ const instagram = {
       path: './images/stealLogin/you_have_been_hacked.png'
     });
     console.log(`Login Activity Stolen Check Screenshot`);
+  },
+  end: async () => {
+    await instagram.browser.close();
   }
 };
 
